@@ -311,8 +311,8 @@ for epoch in range(n_epochs):
         #t_acc.append(t_acc_temp)
         #print(model.evaluate(np.array(x_batch), np.array(y_batch)))
     #print(np.array(x).shape)
-    training_accuracy[epoch] = np.mean(t_acc)
-    training_loss[epoch] = np.mean(t_loss)
+    #training_accuracy[epoch] = np.mean(t_acc)
+    #training_loss[epoch] = np.mean(t_loss)
     print("Valuation data")
     for idx, (X, y) in enumerate(val_ds):
         v_loss_temp, v_acc_temp = model.evaluate(np.array(X), np.array(y))
