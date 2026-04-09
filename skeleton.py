@@ -24,7 +24,7 @@ class_map = {"Happy": 0,
 cache = True
 
 # You will have to change these two
-n_epochs = 2
+n_epochs = 5
 batch_size = 32
 
 # Directory where the data are stored
@@ -178,6 +178,7 @@ train_ds = DataLoader(os.path.join(data_dir, "train/"),
                       batch_size=batch_size,
                       cache=cache,
                       )
+
 val_ds = DataLoader(os.path.join(data_dir, "val/"),
                     class_map=class_map,
                     batch_size=batch_size,
@@ -196,10 +197,10 @@ print(f"Number of training mini-batches: {len(train_ds)}")
 print(f"Number of training images      : {len(train_ds._indices)}")
 print(f"Number of validation images    : {len(val_ds._indices)}")
 print(f"Number of test images          : {len(test_ds._indices)}")
+#train_ds = tf.data.Dataset.from_tensors(train_ds)
+#val_ds = tf.data.Dataset.from_tensors(val_ds)
+#test_ds = tf.data.Dataset.from_tensors(test_ds)
 
-train_ds = tf.data.Dataset.from_tensors(train_ds)
-val_ds = tf.data.Dataset.from_tensors(val_ds)
-test_ds = tf.data.Dataset.from_tensors(test_ds)
 # Plot a few of the training images
 fig = plt.figure(figsize=(12, 5))
 fig.subplots_adjust(top=0.995,
@@ -236,31 +237,97 @@ for m in range(M):
         list(train_ds.class_map.values()).index(m)]
     axs[m][0].set_ylabel(f"{label}")
 
-
 model = keras.models.Sequential([keras.layers.Conv2D(32, (3,3), activation='relu'),
                                 keras.layers.Flatten(),
                                 keras.layers.Dense(4, activation='softmax')
                                  ])
+
+#model = keras.models.Sequential([keras.layers.Conv2D(32, (3,3), activation='relu'),
+#                                keras.layers.Flatten(),
+#                                keras.layers.Dense(512, activation='relu'),
+#                                keras.layers.Dense(4, activation='softmax')
+#                                 ])
+#model = keras.models.Sequential([keras.layers.Conv2D(32, (3,3), activation='relu', strides = (2,2)),
+#                                 keras.layers.Conv2D(64, (3,3), activation='relu', strides = (2,2)),
+#                                keras.layers.Flatten(),
+#                                keras.layers.Dense(512, activation='relu'),
+#                                keras.layers.Dense(4, activation='softmax')
+#                                 ])
+#model = keras.models.Sequential([keras.layers.Conv2D(32, (3,3), activation='relu', strides = (2,2)),
+#                                 keras.layers.Conv2D(64, (3,3), activation='relu', strides = (2,2)),
+#                                 keras.layers.Conv2D(64, (3,3), activation='relu'),
+#                                keras.layers.Flatten(),
+#                                keras.layers.Dense(512, activation='relu'),
+#                                keras.layers.Dense(4, activation='softmax')
+#                                 ])
+#model = keras.models.Sequential([keras.layers.Conv2D(32, (3,3), activation='relu'),
+#                                 keras.layers.Conv2D(64, (3,3), activation='relu'),
+#                                 keras.layers.Conv2D(64, (3,3), activation='relu'),
+#                                keras.layers.Flatten(),
+#                                keras.layers.Dense(512, activation='relu'),
+#                                keras.layers.Dense(4, activation='softmax')
+#                                 ])
+#model = keras.models.Sequential([keras.layers.Conv2D(32, (3,3), activation='relu'),
+#                                 keras.layers.Conv2D(48, (3,3), activation='relu'),
+#                                 keras.layers.MaxPooling2D((2,2)),
+#                                 keras.layers.Conv2D(64, (3,3), activation='relu'),
+#                                keras.layers.Flatten(),
+#                                keras.layers.Dense(512, activation='relu'),
+#                                keras.layers.Dropout(0.2),
+#                                keras.layers.Dense(256),
+#                                keras.layers.Dropout(0.1),
+#                                keras.layers.Dense(4, activation='softmax')
+#                                 ])
 model.compile(optimizer = 'adam', loss = 'sparse_categorical_crossentropy', metrics=['accuracy'])
 # Define and compile your model here. Don't forget to use accuracy as a metric.
 
 
 time_ = time.time()
-history = model.fit(
-    train_ds,
-    validation_data=val_ds,
-    epochs=2   # you can increase/decrease based on speed
-)
-training_loss = []  # Save training loss values here
+#history = model.fit(train_ds, validation_data=val_ds, epochs=n_epochs)
+#history = model.fit(
+#    train_ds,
+#    validation_data=val_ds,
+#    epochs=2   # you can increase/decrease based on speed
+#)
+training_loss = list()  # Save training loss values here
+training_accuracy = []
 validation_loss = []  # Save validation loss values here
+validation_accuracy = []
 for epoch in range(n_epochs):
-
+    t_loss = []
+    t_acc = []
+    v_loss = []
+    v_acc = []
+    print(f"epoch: {epoch + 1}")
+    time.sleep(1)
+    #for batch_idx in range(len(train_ds)):
+    for idx, (X, y) in enumerate(train_ds):
+        # Get the current batch from the data loader
+        #x_batch, y_batch = train_ds[batch_idx]
+        #print("x_batch shape:", np.array(x_batch).shape)
+        model.train_on_batch(np.array(X), np.array(y))
+        t_loss_temp, t_acc_temp = model.evaluate(np.array(X), np.array(y))
+        #t_loss.append(t_loss_temp)
+        #t_acc.append(t_acc_temp)
+        #print(model.evaluate(np.array(x_batch), np.array(y_batch)))
+    #print(np.array(x).shape)
+    training_accuracy[epoch] = np.mean(t_acc)
+    training_loss[epoch] = np.mean(t_loss)
+    print("Valuation data")
+    for idx, (X, y) in enumerate(val_ds):
+        v_loss_temp, v_acc_temp = model.evaluate(np.array(X), np.array(y))
+        #v_loss.append(v_loss_temp)
+        #v_acc.append(v_acc_temp)
+    #validation_accuracy[epoch] = np.mean(v_acc)
+    #validation_loss[epoch] = np.mean(v_loss)
+    #model.fit(np.array(x), np.array(y), batch_size=32)
+        #model.train_on_batch(np.array(x_batch), np.array(y_batch))
     # Implement the training iterations here.
     # You may need to use model.train_on_batch(...) if you use the data loader
     # above.
 
     # If you want to do some preprocessing, this may also be where to do it.
-
+    #print(model.evaluate())
     # You can evaluate the model using model.evaluate(...) to measure its
     # performance.
 
@@ -273,12 +340,10 @@ for epoch in range(n_epochs):
 time_passed = time.time() - time_
 print(f"Training done in {int(time_passed // 60):.0f} minutes "
       f"{int(time_passed % 60):.0f} seconds")
-plt.plot(history.history['accuracy'], label='train acc')
-plt.plot(history.history['val_accuracy'], label='val acc')
-plt.xlabel('Epoch')
-plt.ylabel('Accuracy')
-plt.legend()
-plt.show()
+#fig_acc, ax_acc = plt.subplots()
+#ax_acc.plot(range(n_epochs), t_acc)
+#ax_acc.plot(range(n_epochs), v_acc)
+#plt.show()
 
 # Note: We should never evaluate our model on the test data before we have
 #       chosen a _final model_. This means you should not run the below code
@@ -291,7 +356,7 @@ plt.show()
 if False:
     test_loss = []
     for idx, (X, y) in enumerate(test_ds):
-        pass
+        model.evaluate(np.array(X), np.array(y))
         # Your code goes here.
         # If you did preprocessing, don't forget to apply it here as well.
 
