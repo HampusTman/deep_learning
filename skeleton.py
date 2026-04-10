@@ -25,7 +25,7 @@ class_names = ["Happy", "Sad", "Surprised", "Mad"]
 cache = True
 
 # You will have to change these two
-n_epochs = 5
+n_epochs = 8
 batch_size = 32
 
 # Directory where the data are stored
