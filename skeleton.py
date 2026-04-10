@@ -21,10 +21,11 @@ class_map = {"Happy": 0,
              "Sad": 1,
              "Surprised": 2,
              "Mad": 3}
+class_names = ["Happy", "Sad", "Surprised", "Mad"]
 cache = True
 
 # You will have to change these two
-n_epochs = 2
+n_epochs = 5
 batch_size = 32
 
 # Directory where the data are stored
@@ -237,30 +238,30 @@ print(f"Number of test images          : {len(test_ds._indices)}")
 #        list(train_ds.class_map.values()).index(m)]
 #    axs[m][0].set_ylabel(f"{label}")
 
-model = keras.models.Sequential([keras.layers.Conv2D(32, (3,3), activation='relu'),
-                               keras.layers.Flatten(),
-                               keras.layers.Dense(4, activation='softmax')
-                                ])
+# model = keras.models.Sequential([keras.layers.Conv2D(32, (3,3), activation='relu'),
+#                                keras.layers.Flatten(),
+#                                keras.layers.Dense(4, activation='softmax')
+#                                 ])
 
-#model = keras.models.Sequential([keras.layers.Conv2D(32, (3,3), activation='relu'),
+# model = keras.models.Sequential([keras.layers.Conv2D(32, (3,3), activation='relu'),
 #                                keras.layers.Flatten(),
 #                                keras.layers.Dense(512, activation='relu'),
 #                                keras.layers.Dense(4, activation='softmax')
 #                                 ])
-#model = keras.models.Sequential([keras.layers.Conv2D(32, (3,3), activation='relu', strides = (2,2)),
+# model = keras.models.Sequential([keras.layers.Conv2D(32, (3,3), activation='relu', strides = (2,2)),
 #                                 keras.layers.Conv2D(64, (3,3), activation='relu', strides = (2,2)),
 #                                keras.layers.Flatten(),
 #                                keras.layers.Dense(512, activation='relu'),
 #                                keras.layers.Dense(4, activation='softmax')
-#                                 ])
-#model = keras.models.Sequential([keras.layers.Conv2D(32, (3,3), activation='relu', strides = (2,2)),
+#                                  ])
+# model = keras.models.Sequential([keras.layers.Conv2D(32, (3,3), activation='relu', strides = (2,2)),
 #                                 keras.layers.Conv2D(64, (3,3), activation='relu', strides = (2,2)),
 #                                 keras.layers.Conv2D(64, (3,3), activation='relu'),
 #                                keras.layers.Flatten(),
 #                                keras.layers.Dense(512, activation='relu'),
 #                                keras.layers.Dense(4, activation='softmax')
 #                                 ])
-#model = keras.models.Sequential([keras.layers.Conv2D(32, (3,3), activation='relu'),
+# model = keras.models.Sequential([keras.layers.Conv2D(32, (3,3), activation='relu'),
 #                                 keras.layers.Conv2D(48, (3,3), activation='relu'),
 #                                 keras.layers.MaxPooling2D((2,2)),
 #                                 keras.layers.Conv2D(64, (3,3), activation='relu'),
@@ -270,7 +271,28 @@ model = keras.models.Sequential([keras.layers.Conv2D(32, (3,3), activation='relu
 #                               keras.layers.Dense(256),
 #                               keras.layers.Dropout(0.1),
 #                               keras.layers.Dense(4, activation='softmax')
-#                                ])
+#                                 ])
+
+# model = keras.models.Sequential([keras.layers.Conv2D(32, (3,3), activation='relu', kernel_regularizer=keras.regularizers.l2(0.001)),
+#                                 keras.layers.Conv2D(48, (3,3), activation='relu',kernel_regularizer=keras.regularizers.l2(0.001)),
+#                                 keras.layers.MaxPooling2D((2,2)),
+#                                 keras.layers.Conv2D(64, (3,3), activation='relu', kernel_regularizer=keras.regularizers.l2(0.001)),
+#                                keras.layers.Flatten(),
+#                               keras.layers.Dense(512, activation='relu'),
+#                               keras.layers.Dropout(0.2),
+#                               keras.layers.Dense(256),
+#                               keras.layers.Dropout(0.1),
+#                               keras.layers.Dense(4, activation='softmax')
+#                                 ])
+
+model = keras.models.Sequential([keras.layers.Conv2D(32, (3,3), activation='relu', strides = (2,2)),
+                                keras.layers.Conv2D(64, (3,3), activation='relu', strides = (2,2)),
+                               keras.layers.Flatten(),
+                               keras.layers.Dense(512, activation='relu'),
+                               keras.layers.Dropout(0.5),
+                               keras.layers.Dense(512, activation='relu'),
+                               keras.layers.Dense(4, activation='softmax')
+                                 ])
 model.compile(optimizer = 'adam', loss = 'sparse_categorical_crossentropy', metrics=['accuracy'], run_eagerly = True)
 # Define and compile your model here. Don't forget to use accuracy as a metric.
 
@@ -291,23 +313,37 @@ for epoch in range(n_epochs):
     t_acc = []
     v_loss = []
     v_acc = []
+    correct = np.array([0,0,0,0])
+    total = np.array([0,0,0,0])
+    #tc_acc = []
+    #vc_acc = []
     print(f"epoch: {epoch + 1}")
     time.sleep(1)
     #for batch_idx in range(len(train_ds)):
     for idx, (X, y) in enumerate(train_ds):
+        X = np.array(X)
+        y = np.array(y)
+        #y_pred = np.argmax(model.predict(X), axis=1)
+
+        #print(f"X: {X} y: {y} \n y_pred: {y_pred}")
+        #for i in range(len(correct)):
+            #correct[i] += np.sum((y==i) & (y_pred == i))
+            #total[i] += np.sum(y==i)
+            #print(f"class {i}, correct pred: {correct[i]}, total: {total[i]}")
+        
+        
         # Get the current batch from the data loader
         #x_batch, y_batch = train_ds[batch_idx]
         #print("x_batch shape:", np.array(x_batch).shape)
-        model.train_on_batch(np.array(X), np.array(y))
-        t_loss_temp, t_acc_temp = model.evaluate(np.array(X), np.array(y))
+        model.train_on_batch(X, y)
+        t_loss_temp, t_acc_temp= model.evaluate(np.array(X), np.array(y))
+        #print(f"tclass acc: {tc_acc} tloss: {t_loss_temp} t_acc: {t_acc_temp}")
         t_loss.append(t_loss_temp)
         t_acc.append(t_acc_temp)
         #print(model.evaluate(np.array(x_batch), np.array(y_batch)))
     #print(np.array(x).shape)
     training_accuracy.append(np.mean(t_acc))
     training_loss.append(np.mean(t_loss))
-    print(training_accuracy[epoch])
-    time.sleep(0.2)
     print("Valuation data")
     for idx, (X, y) in enumerate(val_ds):
         v_loss_temp, v_acc_temp = model.evaluate(np.array(X), np.array(y))
@@ -315,8 +351,6 @@ for epoch in range(n_epochs):
         v_acc.append(v_acc_temp)
     validation_accuracy.append(np.mean(v_acc))
     validation_loss.append(np.mean(v_loss))
-    print(validation_accuracy[epoch])
-    time.sleep(0.2)
     #model.fit(np.array(x), np.array(y), batch_size=32)
         #model.train_on_batch(np.array(x_batch), np.array(y_batch))
     # Implement the training iterations here.
@@ -331,24 +365,51 @@ for epoch in range(n_epochs):
     # Call manually at the end of the epoch to reshuffle the training data.
     train_ds.on_epoch_end()
 
-    print(f"[{epoch:02d}/{n_epochs}] {training_loss[-1]} "
-          f"{validation_loss[-1]}")
+    print(f"epoch: [{epoch+1:1d}/{n_epochs}] training loss: {training_loss[-1]} "
+          f"validation loss: {validation_loss[-1]}\n"
+          f"training accuracy: {training_accuracy[epoch]}\n"
+          f"validation accuracy: {validation_accuracy[epoch]}")
 
 time_passed = time.time() - time_
 print(f"Training done in {int(time_passed // 60):.0f} minutes "
       f"{int(time_passed % 60):.0f} seconds")
 training_accuracy = np.array(training_accuracy)
 validation_accuracy = np.array(validation_accuracy)
-print(f"Shape of t_acc: {training_accuracy.shape}")
-print(f"Shape of v_acc: {validation_accuracy.shape}")
+#print(f"Shape of t_acc: {training_accuracy.shape}")
+#print(f"Shape of v_acc: {validation_accuracy.shape}")
 print(training_accuracy[0])
 plt.figure("1")
-plt.plot(range(n_epochs), training_accuracy)
-plt.plot(range(n_epochs), validation_accuracy)
+plt.plot(range(n_epochs), training_accuracy, label='training')
+plt.plot(range(n_epochs), validation_accuracy, label='validation')
+plt.xlabel("epoch")
+plt.ylabel("accuracy")
+plt.legend()
+
 #ax_acc.plot(range(n_epochs), training_accuracy)
 #fig_acc.plot(range(n_epochs), validation_accuracy)
 plt.show()
 
+plt.figure("2")
+plt.plot(range(n_epochs), training_loss, label='training')
+plt.plot(range(n_epochs), validation_loss, label = 'validation')
+plt.xlabel("epoch")
+plt.ylabel("loss")
+plt.legend()
+plt.show()
+
+correct_val = np.array([0,0,0,0])
+total_val = np.array([0,0,0,0])
+for idx, (X, y) in enumerate(val_ds):
+    X = np.array(X)
+    y = np.array(y)
+    y_pred = np.argmax(model.predict(X), axis=1)
+    for i in range(len(correct)):
+            correct[i] += np.sum((y==i) & (y_pred == i))
+            total[i] += np.sum(y==i)
+print("Recall for validation data")
+for i in range(len(correct)):
+            print(f"The number of correct predictions of class {class_names[i]}: {correct[i]}\nTotal number of class {class_names[i]}: {total[i]}\n recall: {correct[i]/total[i]}\n\n")
+            time.sleep(0.5)
 # Note: We should never evaluate our model on the test data before we have
 #       chosen a _final model_. This means you should not run the below code
 #       until you are done and ready to hand in the assignment. It will be
@@ -358,9 +419,18 @@ plt.show()
 #       to your model and evaluate it again, there is no value in this
 #       evaluation any more.
 if False:
+    print("recall for test data")
     test_loss = []
+    correct_test = np.array([0,0,0,0])
+    total_test = np.array([0,0,0,0])
     for idx, (X, y) in enumerate(test_ds):
+        X = np.array(X)
+        y = np.array(y)
         model.evaluate(np.array(X), np.array(y))
+        y_pred = np.argmax(model.predict(X), axis=1)
+        for i in range(len(correct)):
+            correct_test[i] += np.sum((y==i) & (y_pred == i))
+            total_test[i] += np.sum(y==i)
         # Your code goes here.
         # If you did preprocessing, don't forget to apply it here as well.
 
