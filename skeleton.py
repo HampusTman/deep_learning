@@ -24,7 +24,7 @@ class_map = {"Happy": 0,
 cache = True
 
 # You will have to change these two
-n_epochs = 5
+n_epochs = 2
 batch_size = 32
 
 # Directory where the data are stored
@@ -46,18 +46,18 @@ else:
     print("No GPU(s) available. Training will be very slow ...")
 
 # For pretty plots...
-PLOT_SETTINGS = {"text.usetex": True,
-                 "font.family": "serif",
-                 "figure.figsize": (8.0, 6.0),
-                 "font.size": 16,
-                 "axes.labelsize": 16,
-                 "legend.fontsize": 14,
-                 "xtick.labelsize": 14,
-                 "ytick.labelsize": 14,
-                 "axes.titlesize": 24,
-                 "lines.linewidth": 2.0,
-                 }
-plt.rcParams.update(PLOT_SETTINGS)
+#PLOT_SETTINGS = {"text.usetex": True,
+#                 "font.family": "serif",
+#                 "figure.figsize": (8.0, 6.0),
+#                 "font.size": 16,
+#                 "axes.labelsize": 16,
+#                 "legend.fontsize": 14,
+#                 "xtick.labelsize": 14,
+#                 "ytick.labelsize": 14,
+#                 "axes.titlesize": 24,
+#                 "lines.linewidth": 2.0,
+#                 }
+#plt.rcParams.update(PLOT_SETTINGS)
 
 
 class DataLoader(keras.utils.Sequence):
@@ -202,45 +202,45 @@ print(f"Number of test images          : {len(test_ds._indices)}")
 #test_ds = tf.data.Dataset.from_tensors(test_ds)
 
 # Plot a few of the training images
-fig = plt.figure(figsize=(12, 5))
-fig.subplots_adjust(top=0.995,
-                    bottom=0.005,
-                    left=0.025,
-                    right=0.995,
-                    wspace=0.05,
-                    hspace=0.0125)
-M, N = 4, 10
-axs = []
-for m in range(M):
-    axs.append([])
-    for n in range(N):
-        ax = plt.subplot2grid((M, N), (m, n), rowspan=1, colspan=1)
-        ax.xaxis.set_ticklabels([])
-        ax.xaxis.set_ticks([])
-        ax.yaxis.set_ticklabels([])
-        ax.yaxis.set_ticks([])
-        axs[m].append(ax)
+#fig = plt.figure(figsize=(12, 5))
+#fig.subplots_adjust(top=0.995,
+#                    bottom=0.005,
+#                    left=0.025,
+#                    right=0.995,
+#                    wspace=0.05,
+#                    hspace=0.0125)
+#M, N = 4, 10
+#axs = []
+#for m in range(M):
+#    axs.append([])
+#    for n in range(N):
+#        ax = plt.subplot2grid((M, N), (m, n), rowspan=1, colspan=1)
+#        ax.xaxis.set_ticklabels([])
+#        ax.xaxis.set_ticks([])
+#        ax.yaxis.set_ticklabels([])
+#        ax.yaxis.set_ticks([])
+#        axs[m].append(ax)
 
-imgs = []
-lbls = []
-for i in range(3):
-    imgs.extend(train_ds[i][0])
-    lbls.extend(train_ds[i][1])
-indices = [0] * 4
-for i in range(len(imgs)):
-    y = lbls[i]
-    if indices[y] < N:
-        axs[y][indices[y]].imshow(imgs[i].astype(int))  # int [0,...,255]
-        indices[y] += 1
-for m in range(M):
-    label = list(train_ds.class_map.keys())[
-        list(train_ds.class_map.values()).index(m)]
-    axs[m][0].set_ylabel(f"{label}")
+#imgs = []
+#lbls = []
+#for i in range(3):
+#    imgs.extend(train_ds[i][0])
+#    lbls.extend(train_ds[i][1])
+#indices = [0] * 4
+#for i in range(len(imgs)):
+#    y = lbls[i]
+#    if indices[y] < N:
+#        axs[y][indices[y]].imshow(imgs[i].astype(int))  # int [0,...,255]
+#        indices[y] += 1
+#for m in range(M):
+#    label = list(train_ds.class_map.keys())[
+#        list(train_ds.class_map.values()).index(m)]
+#    axs[m][0].set_ylabel(f"{label}")
 
 model = keras.models.Sequential([keras.layers.Conv2D(32, (3,3), activation='relu'),
-                                keras.layers.Flatten(),
-                                keras.layers.Dense(4, activation='softmax')
-                                 ])
+                               keras.layers.Flatten(),
+                               keras.layers.Dense(4, activation='softmax')
+                                ])
 
 #model = keras.models.Sequential([keras.layers.Conv2D(32, (3,3), activation='relu'),
 #                                keras.layers.Flatten(),
@@ -255,13 +255,6 @@ model = keras.models.Sequential([keras.layers.Conv2D(32, (3,3), activation='relu
 #                                 ])
 #model = keras.models.Sequential([keras.layers.Conv2D(32, (3,3), activation='relu', strides = (2,2)),
 #                                 keras.layers.Conv2D(64, (3,3), activation='relu', strides = (2,2)),
-#                                 keras.layers.Conv2D(64, (3,3), activation='relu'),
-#                                keras.layers.Flatten(),
-#                                keras.layers.Dense(512, activation='relu'),
-#                                keras.layers.Dense(4, activation='softmax')
-#                                 ])
-#model = keras.models.Sequential([keras.layers.Conv2D(32, (3,3), activation='relu'),
-#                                 keras.layers.Conv2D(64, (3,3), activation='relu'),
 #                                 keras.layers.Conv2D(64, (3,3), activation='relu'),
 #                                keras.layers.Flatten(),
 #                                keras.layers.Dense(512, activation='relu'),
@@ -272,13 +265,13 @@ model = keras.models.Sequential([keras.layers.Conv2D(32, (3,3), activation='relu
 #                                 keras.layers.MaxPooling2D((2,2)),
 #                                 keras.layers.Conv2D(64, (3,3), activation='relu'),
 #                                keras.layers.Flatten(),
-#                                keras.layers.Dense(512, activation='relu'),
-#                                keras.layers.Dropout(0.2),
-#                                keras.layers.Dense(256),
-#                                keras.layers.Dropout(0.1),
-#                                keras.layers.Dense(4, activation='softmax')
-#                                 ])
-model.compile(optimizer = 'adam', loss = 'sparse_categorical_crossentropy', metrics=['accuracy'])
+#                               keras.layers.Dense(512, activation='relu'),
+#                               keras.layers.Dropout(0.2),
+#                               keras.layers.Dense(256),
+#                               keras.layers.Dropout(0.1),
+#                               keras.layers.Dense(4, activation='softmax')
+#                                ])
+model.compile(optimizer = 'adam', loss = 'sparse_categorical_crossentropy', metrics=['accuracy'], run_eagerly = True)
 # Define and compile your model here. Don't forget to use accuracy as a metric.
 
 
@@ -289,7 +282,7 @@ time_ = time.time()
 #    validation_data=val_ds,
 #    epochs=2   # you can increase/decrease based on speed
 #)
-training_loss = list()  # Save training loss values here
+training_loss = []  # Save training loss values here
 training_accuracy = []
 validation_loss = []  # Save validation loss values here
 validation_accuracy = []
@@ -307,19 +300,23 @@ for epoch in range(n_epochs):
         #print("x_batch shape:", np.array(x_batch).shape)
         model.train_on_batch(np.array(X), np.array(y))
         t_loss_temp, t_acc_temp = model.evaluate(np.array(X), np.array(y))
-        #t_loss.append(t_loss_temp)
-        #t_acc.append(t_acc_temp)
+        t_loss.append(t_loss_temp)
+        t_acc.append(t_acc_temp)
         #print(model.evaluate(np.array(x_batch), np.array(y_batch)))
     #print(np.array(x).shape)
-    #training_accuracy[epoch] = np.mean(t_acc)
-    #training_loss[epoch] = np.mean(t_loss)
+    training_accuracy.append(np.mean(t_acc))
+    training_loss.append(np.mean(t_loss))
+    print(training_accuracy[epoch])
+    time.sleep(0.2)
     print("Valuation data")
     for idx, (X, y) in enumerate(val_ds):
         v_loss_temp, v_acc_temp = model.evaluate(np.array(X), np.array(y))
-        #v_loss.append(v_loss_temp)
-        #v_acc.append(v_acc_temp)
-    #validation_accuracy[epoch] = np.mean(v_acc)
-    #validation_loss[epoch] = np.mean(v_loss)
+        v_loss.append(v_loss_temp)
+        v_acc.append(v_acc_temp)
+    validation_accuracy.append(np.mean(v_acc))
+    validation_loss.append(np.mean(v_loss))
+    print(validation_accuracy[epoch])
+    time.sleep(0.2)
     #model.fit(np.array(x), np.array(y), batch_size=32)
         #model.train_on_batch(np.array(x_batch), np.array(y_batch))
     # Implement the training iterations here.
@@ -334,16 +331,23 @@ for epoch in range(n_epochs):
     # Call manually at the end of the epoch to reshuffle the training data.
     train_ds.on_epoch_end()
 
-    #print(f"[{epoch:02d}/{n_epochs}] {training_loss[-1]} "
-    #      f"{validation_loss[-1]}")
+    print(f"[{epoch:02d}/{n_epochs}] {training_loss[-1]} "
+          f"{validation_loss[-1]}")
 
 time_passed = time.time() - time_
 print(f"Training done in {int(time_passed // 60):.0f} minutes "
       f"{int(time_passed % 60):.0f} seconds")
-#fig_acc, ax_acc = plt.subplots()
-#ax_acc.plot(range(n_epochs), t_acc)
-#ax_acc.plot(range(n_epochs), v_acc)
-#plt.show()
+training_accuracy = np.array(training_accuracy)
+validation_accuracy = np.array(validation_accuracy)
+print(f"Shape of t_acc: {training_accuracy.shape}")
+print(f"Shape of v_acc: {validation_accuracy.shape}")
+print(training_accuracy[0])
+plt.figure("1")
+plt.plot(range(n_epochs), training_accuracy)
+plt.plot(range(n_epochs), validation_accuracy)
+#ax_acc.plot(range(n_epochs), training_accuracy)
+#fig_acc.plot(range(n_epochs), validation_accuracy)
+plt.show()
 
 # Note: We should never evaluate our model on the test data before we have
 #       chosen a _final model_. This means you should not run the below code
