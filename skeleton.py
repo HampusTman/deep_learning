@@ -441,7 +441,7 @@ if True:
           f"accuracy: {np.mean(test_accuracy)}\n"
           f"The recall for ")
     for i in range(len(correct)):
-            print(f"The number of correct predictions of class {class_names[i]}: {correct_test[i]}\nTotal number of class {class_names[i]}: {total_test[i]}\n recall: {correct[i]/total[i]}\n\n")
+            print(f"The number of correct predictions of class {class_names[i]}: {correct_test[i]}\nTotal number of class {class_names[i]}: {total_test[i]}\n recall: {correct_test[i]/total_test[i]}\n\n")
 
 # Plot the training and validation curves
 
