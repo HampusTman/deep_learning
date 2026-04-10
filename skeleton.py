@@ -418,15 +418,18 @@ for i in range(len(correct)):
 #       _final model_ that you evaluate with the test data. If you do anything
 #       to your model and evaluate it again, there is no value in this
 #       evaluation any more.
-if False:
-    print("recall for test data")
+if True:
+    print("evaluating model on test data")
     test_loss = []
+    test_accuracy = []
     correct_test = np.array([0,0,0,0])
     total_test = np.array([0,0,0,0])
     for idx, (X, y) in enumerate(test_ds):
         X = np.array(X)
         y = np.array(y)
-        model.evaluate(np.array(X), np.array(y))
+        t_loss_temp, t_acc_temp = model.evaluate(X, y)
+        test_loss.append(t_loss_temp)
+        test_accuracy.append(t_acc_temp)
         y_pred = np.argmax(model.predict(X), axis=1)
         for i in range(len(correct)):
             correct_test[i] += np.sum((y==i) & (y_pred == i))
@@ -434,9 +437,13 @@ if False:
         # Your code goes here.
         # If you did preprocessing, don't forget to apply it here as well.
 
-    print(f"Final test results {np.mean(test_loss, axis=0)}")
-
+    print(f"\nFinal test results: \nloss: {np.mean(test_loss)}\n"
+          f"accuracy: {np.mean(test_accuracy)}\n"
+          f"The recall for ")
+    for i in range(len(correct)):
+            print(f"The number of correct predictions of class {class_names[i]}: {correct_test[i]}\nTotal number of class {class_names[i]}: {total_test[i]}\n recall: {correct[i]/total[i]}\n\n")
 
 # Plot the training and validation curves
 
 # Save the model to file using model.save(...)
+model.save("my_model.keras")
