@@ -16,7 +16,7 @@ import matplotlib.pyplot as plt
 import tensorflow as tf
 import tensorflow.keras as keras
 
-SEED = 2026
+SEED = 1337
 class_map = {"Happy": 0,
              "Sad": 1,
              "Surprised": 2,
@@ -25,7 +25,7 @@ class_names = ["Happy", "Sad", "Surprised", "Mad"]
 cache = True
 
 # You will have to change these two
-n_epochs = 8
+n_epochs = 25
 batch_size = 32
 
 # Directory where the data are stored
@@ -285,14 +285,72 @@ print(f"Number of test images          : {len(test_ds._indices)}")
 #                               keras.layers.Dense(4, activation='softmax')
 #                                 ])
 
-model = keras.models.Sequential([keras.layers.Conv2D(32, (3,3), activation='relu', strides = (2,2)),
-                                keras.layers.Conv2D(64, (3,3), activation='relu', strides = (2,2)),
-                               keras.layers.Flatten(),
-                               keras.layers.Dense(512, activation='relu'),
-                               keras.layers.Dropout(0.5),
-                               keras.layers.Dense(512, activation='relu'),
-                               keras.layers.Dense(4, activation='softmax')
-                                 ])
+# model = keras.models.Sequential([keras.layers.Conv2D(24, (3,3), activation='relu', kernel_regularizer=keras.regularizers.l2(0.0001)),
+#                                 keras.layers.MaxPooling2D((2,2)),
+#                                 keras.layers.Conv2D(48, (3,3), activation='relu',kernel_regularizer=keras.regularizers.l2(0.0001)),
+#                                 keras.layers.MaxPooling2D((2,2)),
+#                                 keras.layers.Conv2D(48, (3,3), activation='relu', kernel_regularizer=keras.regularizers.l2(0.0001)),
+#                                keras.layers.Flatten(),
+#                               #keras.layers.Dense(512, activation='relu'),
+#                               #keras.layers.Dropout(0.2),
+#                               #keras.layers.Dense(256, activation='relu'),
+#                               #keras.layers.Dropout(0.1),
+#                               keras.layers.Dense(4, activation='softmax')
+#                                 ])
+# model = keras.models.Sequential([keras.layers.Conv2D(32, (3,3), activation='relu', strides = (2,2)),
+#                                 keras.layers.Conv2D(64, (3,3), activation='relu', strides = (2,2)),
+#                                keras.layers.Flatten(),
+#                                keras.layers.Dense(512, activation='relu'),
+#                                keras.layers.Dropout(0.5),
+#                                keras.layers.Dense(512, activation='relu'),
+#                                keras.layers.Dense(4, activation='softmax')
+#                                  ])
+
+# model = keras.models.Sequential([
+#                                 keras.layers.Normalization(axis=-1),
+#                                 keras.layers.Conv2D(24, (3,3), activation='hard_silu', input_shape=(112,112,3)),
+#                                 keras.layers.BatchNormalization(),
+#                                 keras.layers.AveragePooling2D((2,2)),
+#                                 keras.layers.Conv2D(48, (3,3), activation='hard_silu'),
+#                                 keras.layers.BatchNormalization(),
+#                                 keras.layers.MaxPooling2D((2,2)),
+#                                 keras.layers.Conv2D(48, (3,3), activation='hard_silu'),
+#                                 keras.layers.Flatten(),
+#                                 keras.layers.Dense(512, activation='relu', kernel_regularizer=keras.regularizers.l2(0.001)),
+#                                 keras.layers.Dense(4, activation='softmax')
+#                                 ])
+
+# model = keras.models.Sequential([
+#                                 keras.layers.Normalization(axis=-1),
+#                                 keras.layers.Conv2D(24, (3,3), activation='hard_silu', input_shape=(112,112,3)),
+#                                 keras.layers.BatchNormalization(),
+#                                 keras.layers.AveragePooling2D((2,2)),
+#                                 keras.layers.Conv2D(48, (3,3), activation='hard_silu'),
+#                                 keras.layers.BatchNormalization(),
+#                                 keras.layers.MaxPooling2D((2,2)),
+#                                 keras.layers.Conv2D(48, (3,3), activation='hard_silu'),
+#                                 keras.layers.BatchNormalization(),
+#                                 keras.layers.GlobalAveragePooling2D(),
+#                                 keras.layers.Dense(256, activation='relu', kernel_regularizer=keras.regularizers.l2(0.001)),
+#                                 keras.layers.Dense(128, activation='relu', kernel_regularizer=keras.regularizers.l2(0.001)),
+#                                 keras.layers.Dense(4, activation='softmax')
+#                                 ])
+
+model = keras.models.Sequential([
+                                keras.layers.Normalization(axis=-1),
+                                keras.layers.Conv2D(24, (3,3), activation='hard_silu', input_shape=(112,112,3)),
+                                keras.layers.BatchNormalization(),
+                                keras.layers.AveragePooling2D((2,2)),
+                                keras.layers.Conv2D(48, (3,3), activation='hard_silu'),
+                                keras.layers.BatchNormalization(),
+                                keras.layers.MaxPooling2D((2,2)),
+                                keras.layers.Conv2D(64, (3,3), activation='hard_silu'),
+                                keras.layers.BatchNormalization(),
+                                keras.layers.GlobalAveragePooling2D(),
+                                keras.layers.Dense(256, activation='hard_silu', kernel_regularizer=keras.regularizers.l2(0.001)),
+                                keras.layers.Dense(128, activation='hard_silu', kernel_regularizer=keras.regularizers.l2(0.001)),
+                                keras.layers.Dense(4, activation='softmax')
+                                ])
 model.compile(optimizer = 'adam', loss = 'sparse_categorical_crossentropy', metrics=['accuracy'], run_eagerly = True)
 # Define and compile your model here. Don't forget to use accuracy as a metric.
 
@@ -323,6 +381,8 @@ for epoch in range(n_epochs):
     for idx, (X, y) in enumerate(train_ds):
         X = np.array(X)
         y = np.array(y)
+        #print(X.shape)
+        #print(idx)
         #y_pred = np.argmax(model.predict(X), axis=1)
 
         #print(f"X: {X} y: {y} \n y_pred: {y_pred}")
@@ -334,7 +394,8 @@ for epoch in range(n_epochs):
         
         # Get the current batch from the data loader
         #x_batch, y_batch = train_ds[batch_idx]
-        #print("x_batch shape:", np.array(x_batch).shape)
+        # print("x_batch shape:", X.shape)
+        # print(X[1].shape)
         model.train_on_batch(X, y)
         t_loss_temp, t_acc_temp= model.evaluate(np.array(X), np.array(y))
         #print(f"tclass acc: {tc_acc} tloss: {t_loss_temp} t_acc: {t_acc_temp}")
@@ -410,6 +471,7 @@ print("Recall for validation data")
 for i in range(len(correct)):
             print(f"The number of correct predictions of class {class_names[i]}: {correct[i]}\nTotal number of class {class_names[i]}: {total[i]}\n recall: {correct[i]/total[i]}\n\n")
             time.sleep(0.5)
+model.summary()
 # Note: We should never evaluate our model on the test data before we have
 #       chosen a _final model_. This means you should not run the below code
 #       until you are done and ready to hand in the assignment. It will be
@@ -418,7 +480,7 @@ for i in range(len(correct)):
 #       _final model_ that you evaluate with the test data. If you do anything
 #       to your model and evaluate it again, there is no value in this
 #       evaluation any more.
-if True:
+if False:
     print("evaluating model on test data")
     test_loss = []
     test_accuracy = []
@@ -446,4 +508,4 @@ if True:
 # Plot the training and validation curves
 
 # Save the model to file using model.save(...)
-model.save("my_model.keras")
+#model.save("my_model.keras")
